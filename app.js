@@ -10,7 +10,7 @@ var express = require('express')
   , path = require('path');
 
 var app = express();
-
+var mysql      = require('mysql');
 // all environments
 app.set('port', process.env.PORT || 3000);
 app.set('views', __dirname + '/views');
@@ -26,6 +26,25 @@ app.use(express.static(path.join(__dirname, 'public')));
 if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
+
+var connection = mysql.createConnection({
+	  host     : 'ec2-54-204-35-114.compute-1.amazonaws.com',
+	  user     : 'glwrbiudmqnwsp',
+	  password : 'J1ihQDJmR4uEmAHLeiVJRPwLgU',
+	  database : 'd2hibm48u1o95j'
+	});
+
+	connection.connect();
+	
+	app.get('/', function(request, response) {
+	    connection.query('SELECT * from winner_info', function(err, rows, fields) {
+	        if (err) {
+	            console.log('error: ', err);
+	            throw err;
+	        }
+	        response.send(['Hello World!!!! HOLA MUNDO!!!!', rows]);
+	    });
+	});
 
 app.get('/', routes.index);
 app.get('/users', user.list);
