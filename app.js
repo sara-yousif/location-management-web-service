@@ -27,25 +27,38 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-var connection = mysql.createConnection({
+var connection = mysql.createConnection(//'postgres://glwrbiudmqnwsp:J1ihQDJmR4uEmAHLeiVJRPwLgU@ec2-54-204-35-114.compute-1.amazonaws.com:5432/d2hibm48u1o95j');
+		{
+			
+//				  host     : 'localhost',
+//				  user     : 'root',
+//				  password : 'root',
+//				  database : 'test',
+//				  port : '3306'
+//				});
+			
 	  host     : 'ec2-54-204-35-114.compute-1.amazonaws.com',
 	  user     : 'glwrbiudmqnwsp',
 	  password : 'J1ihQDJmR4uEmAHLeiVJRPwLgU',
-	  database : 'd2hibm48u1o95j'
+	  database : 'd2hibm48u1o95j',
+	  port : '5432'
 	});
-
+console.log('Done1');
 	connection.connect();
 	
 	app.get('/', function(request, response) {
-	    connection.query('SELECT * from winner_info', function(err, rows, fields) {
+		 console.log('try!!');
+	    connection.query('SELECT * from winner_info;', function(err, rows, fields) {
 	        if (err) {
 	            console.log('error: ', err);
 	            throw err;
 	        }
+	      
+	        console.log('Done2');
 	        response.send(['Hello World!!!! HOLA MUNDO!!!!', rows]);
 	    });
 	});
-
+	 
 app.get('/', routes.index);
 app.get('/users', user.list);
 
