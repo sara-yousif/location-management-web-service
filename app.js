@@ -10,7 +10,11 @@ var express = require('express')
   , path = require('path');
 
 var app = express();
-var mysql      = require('mysql');
+var pg = require('pg');
+var conString = "postgres://glwrbiudmqnwsp:J1ihQDJmR4uEmAHLeiVJRPwLgU@ec2-54-204-35-114.compute-1.amazonaws.com:5432/d2hibm48u1o95j";
+
+var client = new pg.Client(conString);
+client.connect();
 // all environments
 app.set('port', process.env.PORT || 3000);
 app.set('views', __dirname + '/views');
@@ -27,41 +31,49 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-var connection = mysql.createConnection(//'postgres://glwrbiudmqnwsp:J1ihQDJmR4uEmAHLeiVJRPwLgU@ec2-54-204-35-114.compute-1.amazonaws.com:5432/d2hibm48u1o95j');
-		{
-			
-//				  host     : 'localhost',
-//				  user     : 'root',
-//				  password : 'root',
-//				  database : 'test',
-//				  port : '3306'
-//				});
-			
-	  host     : 'ec2-54-204-35-114.compute-1.amazonaws.com',
-	  user     : 'glwrbiudmqnwsp',
-	  password : 'J1ihQDJmR4uEmAHLeiVJRPwLgU',
-	  database : 'd2hibm48u1o95j',
-	  port : '5432'
+////pg.connect('', function(err, client) {
+//	  var query = client.query('SELECT * FROM winner_info');
+//
+//	  query.on('row', function(row) {
+//	    console.log(JSON.stringify(row));
+//	  });
+//	//});
+
+client.connect(function(err) {
+	  if(err) {
+	    return console.error('could not connect to postgres', err);
+	  }
 	});
-console.log('Done1');
-	connection.connect();
-	
-	app.get('/', function(request, response) {
-		 console.log('try!!');
-	    connection.query('SELECT * from winner_info;', function(err, rows, fields) {
-	        if (err) {
-	            console.log('error: ', err);
-	            throw err;
-	        }
-	      
-	        console.log('Done2');
-	        response.send(['Hello World!!!! HOLA MUNDO!!!!', rows]);
-	    });
-	});
-	 
+//
+//app.get('/', function(req, res){
+//	  client.query('SELECT * FROM winner_info', function(err, rows) { 
+//	 //   res.render('users', {users: docs, title: 'App42PaaS Express PostgreSQL Application'});
+//		  res.send(['Hello World!!!! HOLA MUNDO!!!!', rows]);
+//	        console.log('Done!!');  
+//	  });
+//	});
+//
+//function testDate(onDone) {
+//    pg.connect(conString, function(err, client) {
+//        client.query("SELECT * from winner_info", function(err, result) {
+//            console.log("Row ",result.rows);  // 1
+//
+//            onDone();
+//        });
+//    });
+//}
+
 app.get('/', routes.index);
 app.get('/users', user.list);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
+  pg.connect(conString, function(err, client,done) {
+	//  console.log("INSIDE CONNECT"); 
+  client.query("SELECT * FROM winner_info", function(err, result) {
+	    done();
+	      if(err) return console.error(err);
+      console.log("Row ",result.rows);  // 1
+  });
+  });
 });
