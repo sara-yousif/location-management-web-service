@@ -11,9 +11,15 @@ var express = require('express')
 
 var app = express();
 var pg = require('pg');
-var conString = "postgres://glwrbiudmqnwsp:J1ihQDJmR4uEmAHLeiVJRPwLgU@ec2-54-204-35-114.compute-1.amazonaws.com:5432/d2hibm48u1o95j";
 
-var client = new pg.Client(conString);
+var client = new pg.Client({
+    user: "glwrbiudmqnwsp",
+    password: "J1ihQDJmR4uEmAHLeiVJRPwLgU",
+    database: "d2hibm48u1o95j",
+    port: 5432,
+    host: "ec2-54-204-35-114.compute-1.amazonaws.com",
+    ssl: true
+}); 
 client.connect();
 // all environments
 app.set('port', process.env.PORT || 3000);
@@ -31,49 +37,39 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-////pg.connect('', function(err, client) {
-//	  var query = client.query('SELECT * FROM winner_info');
-//
-//	  query.on('row', function(row) {
-//	    console.log(JSON.stringify(row));
-//	  });
-//	//});
 
-client.connect(function(err) {
-	  if(err) {
-	    return console.error('could not connect to postgres', err);
-	  }
-	});
-//
-//app.get('/', function(req, res){
-//	  client.query('SELECT * FROM winner_info', function(err, rows) { 
-//	 //   res.render('users', {users: docs, title: 'App42PaaS Express PostgreSQL Application'});
-//		  res.send(['Hello World!!!! HOLA MUNDO!!!!', rows]);
-//	        console.log('Done!!');  
-//	  });
-//	});
-//
-//function testDate(onDone) {
-//    pg.connect(conString, function(err, client) {
-//        client.query("SELECT * from winner_info", function(err, result) {
-//            console.log("Row ",result.rows);  // 1
-//
-//            onDone();
-//        });
-//    });
-//}
+app.get('/', function(req, res){
+	 client.query("SELECT NOW() as when", function(err, result) {
+         console.log("Row count: %d",result.rows.length);  // 1
+         console.log("Current year: %d", result.rows[0].when.getFullYear());
+	 });
+	 client.query("INSERT INTO winner_info(contest_id, name, statement) VALUES($1, $2, $3)",
+	            ["4", "sinichi", "Perfect!!"]);
+	 
+	  var query = client.query('SELECT MAX(contest_id) FROM winner_info');
+
+	  query.on('row', function(row) {
+		  var x = row.max;
+		  console.log(x);
+		  var query = client.query('SELECT * FROM winner_info where contest_id ='+x);
+
+		  query.on('row', function(row) {
+//	    console.log(JSON.stringify(row));
+		  var name= row.name;
+		  var id= row.contest_id;
+		  console.log(name);
+		  console.log(id);
+		  res.send('Ohayou Gozaimasu  '+ name + ' chan    id ' + id + '   ' + row.statement);
+	  });
+});
+});
 
 app.get('/', routes.index);
 app.get('/users', user.list);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
-  pg.connect(conString, function(err, client,done) {
-	//  console.log("INSIDE CONNECT"); 
-  client.query("SELECT * FROM winner_info", function(err, result) {
-	    done();
-	      if(err) return console.error(err);
-      console.log("Row ",result.rows);  // 1
-  });
-  });
-});
+
+	});
+
+
