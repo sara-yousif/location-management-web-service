@@ -39,26 +39,26 @@ if ('development' == app.get('env')) {
 
 
 app.get('/', function(req, res){
-	 client.query("SELECT NOW() as when", function(err, result) {
-         console.log("Row count: %d",result.rows.length);  // 1
-         console.log("Current year: %d", result.rows[0].when.getFullYear());
-	 });
-	 client.query("INSERT INTO winner_info(contest_id, name, statement) VALUES($1, $2, $3)",
-	            ["4", "sinichi", "Perfect!!"]);
+//	 client.query("SELECT NOW() as when", function(err, result) {
+//       //  console.log("Row count: %d",result.rows.length);  // 1
+//        // console.log("Current year: %d", result.rows[0].when.getFullYear());
+//	 });
+//	 client.query("INSERT INTO winner_info(contest_id, name, statement) VALUES($1, $2, $3)",
+//	            ["4", "sinichi", "Perfect!!"]);
 	 
 	  var query = client.query('SELECT MAX(contest_id) FROM winner_info');
 
 	  query.on('row', function(row) {
 		  var x = row.max;
-		  console.log(x);
+		//  console.log(x);
 		  var query = client.query('SELECT * FROM winner_info where contest_id ='+x);
 
 		  query.on('row', function(row) {
 //	    console.log(JSON.stringify(row));
 		  var name= row.name;
 		  var id= row.contest_id;
-		  console.log(name);
-		  console.log(id);
+		//  console.log(name);
+		//  console.log(id);
 		  res.send('Ohayou Gozaimasu  '+ name + ' chan    id ' + id + '   ' + row.statement);
 	  });
 });
@@ -68,7 +68,7 @@ app.get('/', routes.index);
 app.get('/users', user.list);
 
 http.createServer(app).listen(app.get('port'), function(){
-  console.log('Express server listening on port ' + app.get('port'));
+ // console.log('Express server listening on port ' + app.get('port'));
 
 	});
 
