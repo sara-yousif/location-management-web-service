@@ -1,9 +1,6 @@
 var express = require('express')
   , routes = require('./routes')
   , user = require('./routes/user')
-//  , startContest = require('./routes/startContest')
-//   , startFinals = require('./routes/startFinals')
-//    , pickWinner = require('./routes/pickWinner')
   , http = require('http')
   , path = require('path')
   , request = require('request');
@@ -25,16 +22,6 @@ var Message = {
         winner_msg:''
 };
 
-
-//var client = new pg.Client({
-//    user: "ykzikswhqjjikg",
-//    password: "HkQfFZqdEM9DdxNOwKIOJMDsN2",
-//    database: "dbkp82368tfgup",
-//    port: 5432,
-//    host: "ec2-54-83-201-96.compute-1.amazonaws.com",
-//    ssl: true
-//}); 
-//client.connect();
 
 // all environments
 app.set('port', process.env.PORT || 3000);
@@ -60,39 +47,6 @@ app.get('/users', user.list);
 app.post('/try', function(req, res){
     console.log(req.body);
 });
-//////////////////////////////////////////////////////////Get time////////////////////////////////////////////
-app.get('/time', function(req, res){
-function timing (){
-    request({
-        method: "GET",
-        url: "http://www.earthtools.org/timezone-1.1/24.3671/53.9758",
-        
-            json:true 
-        }, function (err,res,body){
-            
-            parseString(body, function (err, result) {
-                var timeresult = result.timezone.localtime[0];
-                console.log(timeresult);
-                var mytime= timeresult.split(" ");
-                console.log(mytime[3]);
-                
-                var clock= mytime[3].split(":");
-                var hours = clock[0];
-                console.log(hours);
-                var min = clock[1];
-                console.log(min);
-                var sec = clock[2];
-                console.log(sec);
-                
-                
-            });
-            
-        });    
-}
-timing();
-});
-
-
 
 //////////////////////////////////////////////////////////EVENT BROKER////////////////////////////////////////////
 function eventBroker (callback){
